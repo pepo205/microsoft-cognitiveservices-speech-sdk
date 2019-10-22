@@ -21,8 +21,8 @@ export abstract class AudioConfig {
      * @public
      * @returns {AudioConfig} The audio input configuration being created.
      */
-    public static fromDefaultMicrophoneInput(): AudioConfig {
-        const pcmRecorder = new PcmRecorder();
+    public static fromDefaultMicrophoneInput(frameCallback?: (sampleRate: number, frame: Float32Array) => any): AudioConfig {
+        const pcmRecorder = new PcmRecorder(frameCallback);
         return new AudioConfigImpl(new MicAudioSource(pcmRecorder, bufferSize));
     }
 
@@ -35,8 +35,8 @@ export abstract class AudioConfig {
      *        Default microphone is used the value is omitted.
      * @returns {AudioConfig} The audio input configuration being created.
      */
-    public static fromMicrophoneInput(deviceId?: string): AudioConfig {
-        const pcmRecorder = new PcmRecorder();
+    public static fromMicrophoneInput(deviceId?: string, frameCallback?: (sampleRate: number, frame: Float32Array) => any): AudioConfig {
+        const pcmRecorder = new PcmRecorder(frameCallback);
         return new AudioConfigImpl(new MicAudioSource(pcmRecorder, bufferSize, deviceId));
     }
 

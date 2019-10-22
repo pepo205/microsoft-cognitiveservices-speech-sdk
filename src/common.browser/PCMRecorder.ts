@@ -7,6 +7,16 @@ import { IRecorder } from "./IRecorder";
 export class PcmRecorder implements IRecorder {
     private privMediaResources: IMediaResources;
     private privSpeechProcessorScript: string; // speech-processor.js Url
+    private frameCallback: (sampleRate: number, frame: Float32Array) => any;
+
+    /**
+     * PcmRecorder constructor.
+     * @constructor
+     * @param {frameCallback} frameCallback - calls with every raw frame received from source
+     */
+    public constructor(frameCallback?: (sampleRate: number, frame: Float32Array) => any) {
+        this.frameCallback = frameCallback;
+    }
 
     public record = (context: AudioContext, mediaStream: MediaStream, outputStream: Stream<ArrayBuffer>): void => {
         const desiredSampleRate = 16000;
@@ -32,8 +42,10 @@ export class PcmRecorder implements IRecorder {
         const that = this;
         scriptNode.onaudioprocess = (event: AudioProcessingEvent) => {
             const inputFrame = event.inputBuffer.getChannelData(0);
-
             if (outputStream && !outputStream.isClosed) {
+                if (!!this.frameCallback) {
+                    this.frameCallback(context.sampleRate, inputFrame);
+                }
                 const waveFrame = waveStreamEncoder.encode(needHeader, inputFrame);
                 if (!!waveFrame) {
                     outputStream.writeStreamChunk({
@@ -60,6 +72,9 @@ export class PcmRecorder implements IRecorder {
                         const inputFrame: Float32Array = ev.data as Float32Array;
 
                         if (outputStream && !outputStream.isClosed) {
+                            if (!!this.frameCallback) {
+                                this.frameCallback(context.sampleRate, inputFrame);
+                            }
                             const waveFrame = waveStreamEncoder.encode(needHeader, inputFrame);
                             if (!!waveFrame) {
                                 outputStream.writeStreamChunk({
