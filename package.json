@@ -49,6 +49,8 @@
     "@types/node": "^12.6.8",
     "@types/request": "^2.48.2",
     "@types/ws": "^6.0.1",
+    "babel-loader": "^8.0.6",
+    "core-js": "^3.3.3",
     "dts-bundle-webpack": "^1.0.2",
     "gulp": "^4.0.2",
     "gulp-rename": "^1.4.0",
